@@ -268,7 +268,7 @@ def chat_ai():
 
     data_snapshot = f"""
     Knowledge Base:
-    - Project Models: ARIMA, SARIMAX, and Prophet (Triple-Ensemble Model).
+    - Project Models: ARIMA, SARIMAX, and ETS (Triple-Ensemble Model).
     - All Stores Performance: {store_data}
     - Seasonal Peaks: {seasonal_peak}
     - Revenue: Total ${total_rev:,.0f}, Avg Monthly ${avg_monthly_sales:,.0f}
@@ -279,7 +279,7 @@ def chat_ai():
     Instructions:
     1. Respond ONLY using concise, point-by-point bullet points.
     2. Give EXACT answers based on the provided Knowledge Base.
-    3. If asked about models, explicitly name ARIMA, SARIMAX, and Prophet.
+    3. If asked about models, explicitly name ARIMA, SARIMAX, and ETS.
     4. If asked about a store, look at its specific Sales Amount.
     5. If asked about 'reorder', suggest items that have high sales units."""
 
@@ -340,7 +340,7 @@ def export_pdf():
     pdf.cell(0, 15, "3. Strategic Recommendations", ln=1)
     pdf.set_font("Times", '', 11)
     strategy_text = (
-        "Based on the multi-model ensemble analysis (ARIMA, SARIMAX, Prophet), the business should "
+        "Based on the multi-model ensemble analysis (ARIMA, SARIMAX, ETS), the business should "
         f"maintain inventory levels aligned with the 'Realistic' baseline of ${scenarios.get('realistic',0):,.0f}. "
         "To mitigate project risk, a safety buffer matching the 'Optimistic' projection is recommended."
     )
