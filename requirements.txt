@@ -5,6 +5,5 @@ plotly
 fpdf
 groq
 statsmodels
-prophet
 flask
 gunicorn
