@@ -11,7 +11,7 @@ import warnings
 # Data Science Models
 from statsmodels.tsa.arima.model import ARIMA
 from statsmodels.tsa.statespace.sarimax import SARIMAX
-from prophet import Prophet
+from statsmodels.tsa.holtwinters import ExponentialSmoothing
 
 warnings.filterwarnings('ignore')
 
@@ -71,17 +71,21 @@ def get_forecast_scenarios(ts_dict):
             forecast_results.append({"Forecast_Date": d.strftime('%Y-%m-%d'), "Model": "SARIMAX", "Predicted": float(np.nan_to_num(v))})
     except: pass
 
-    # Prophet
+    # Exponential Smoothing (ETS) - Memory Efficient
     try:
-        p_df = ts.reset_index().rename(columns={'index': 'ds', 0: 'y'})
-        m = Prophet(yearly_seasonality='auto', weekly_seasonality=False, daily_seasonality=False)
-        m.fit(p_df)
-        p_fc = m.predict(m.make_future_dataframe(periods=f_periods, freq='MS')).tail(f_periods)
-        all_preds.append(np.nan_to_num(p_fc['yhat'].values))
-        all_uppers.append(np.nan_to_num(p_fc['yhat_upper'].values))
-        all_lowers.append(np.nan_to_num(p_fc['yhat_lower'].values))
-        for d, v in zip(p_fc['ds'], p_fc['yhat']): 
-            forecast_results.append({"Forecast_Date": d.strftime('%Y-%m-%d'), "Model": "Prophet", "Predicted": float(np.nan_to_num(v))})
+        try:
+            model_ets = ExponentialSmoothing(ts, trend='add', seasonal='add', seasonal_periods=12).fit()
+        except:
+            model_ets = ExponentialSmoothing(ts, trend='add', seasonal=None).fit()
+        
+        pred_ets = model_ets.forecast(f_periods)
+        all_preds.append(np.nan_to_num(pred_ets.values))
+        # Simple Confidence Interval for ETS
+        std_ets = ts.std() if len(ts) > 1 else ts.mean() * 0.1
+        all_uppers.append(np.nan_to_num(pred_ets.values + 1.96 * std_ets))
+        all_lowers.append(np.nan_to_num(np.maximum(0, pred_ets.values - 1.96 * std_ets)))
+        for d, v in zip(f_dates, pred_ets): 
+            forecast_results.append({"Forecast_Date": d.strftime('%Y-%m-%d'), "Model": "ETS (Smoothing)", "Predicted": float(np.nan_to_num(v))})
     except: pass
 
     if not all_preds:
