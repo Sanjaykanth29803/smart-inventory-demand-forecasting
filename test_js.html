@@ -1,0 +1,1 @@
+<script>fetch("http://127.0.0.1:5000/api/forecast", {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({country:"All",store:"All",category:"All",product:"All",v_mult:1.0})}).then(r=>r.json()).then(console.log).catch(console.error);</script>
